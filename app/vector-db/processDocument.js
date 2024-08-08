@@ -9,7 +9,6 @@ require('dotenv').config();
 
 // Initialize OpenAI client with API key
 const openai = new OpenAI({
-  // apiKey:"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",
 	apiKey: process.env.OPENAI_API_KEY,
 });
 
