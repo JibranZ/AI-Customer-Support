@@ -1,8 +1,7 @@
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const OpenAI = require('openai');
-const MODEL = 'text-embedding-3-small'; 
-const { generateEmbedding, addDocumentsToIndex } = require("./embedDocs");
+const MODEL = 'text-embedding-ada-002'; 
 const { createIndex } = require("./pineconeClient");
 require('dotenv').config();
 
@@ -47,23 +46,41 @@ async function createEmbeddings(texts) {
 			encoding_format: "float",
         });
 		console.log();
-		console.log("Embedding");
-		console.log(res);
+		// console.log("\nEmbedding");
+		// console.log(res);
+		// embeddingsList.push(res);
+		// console.log("\nEmbeddingList");
+		// console.log(res.data[0].embedding);
         embeddingsList.push(res.data[0].embedding);
     }
+
+	console.log("\nEmbeddingList");
+	console.log(embeddingsList);
     return embeddingsList;
 }
 
 
-async function addDocsToPinecone (embeddingsList,indexName) {
+async function addDocsToPinecone (embeddingsList,indexName, listName) {
 	const index = await createIndex(indexName); 
 
-	for (const doc of embeddingsList) {
-		await index.upsert({
-			id: doc.id,
-			values: doc
+	// an array that will be populated with the chunk embeddings 
+	const docsToUpsert = [];
+
+	console.log('\n\naddDocToPineCone -- for-loop on embeddingsList\n')
+	console.log(embeddingsList[0]);
+	
+	// iterate through the embeddings, creating a unique ID based on the listName
+	for (let i = 0; i < embeddingsList.length; i++) {
+		docsToUpsert.push({
+			id: String(listName + i),
+			values: embeddingsList[i],
 		});
+		// console.log(i);
+		// console.log(embeddingsList[i]); 
 	}
+	console.log("\n\nDocsToUpsert:\n\n");
+	console.log(docsToUpsert);
+	await index.upsert(docsToUpsert);
 }
 	
 
@@ -73,7 +90,7 @@ async function addDocsToPinecone (embeddingsList,indexName) {
     const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
     const processedTexts = await processPdf(filePath);
     const embeddings = await createEmbeddings(processedTexts);
-	addDocsToPinecone(embeddings,"Nutrition");
+	addDocsToPinecone(embeddings,"healthresearch","test1");
 	console.log("These are the embeddings");
     console.log(embeddings);
 })();

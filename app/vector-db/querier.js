@@ -1,8 +1,7 @@
 const { createIndex } = require("./pineconeClient");
 const OpenAI = require('openai');
 require('dotenv').config();
-const MODEL = 'text-embedding-3-small'; 
-
+const MODEL = 'text-embedding-ada-002'; 
 
 // initialize OpenAI
 const openai = new OpenAI({
@@ -25,12 +24,17 @@ async function generateEmbedding (text) {
 async function addDocumentsToIndex (documents, indexName) {
 	const index = await createIndex(indexName); 
 	
+	const upsertArray = [] ;
+
 	for (const doc of documents) {
 		const embedding = await generateEmbedding(doc.content);
-		await index.upsert({
+		upsertArray.push({
 			id: doc.id,
 			values: embedding, 
 		});
+
+		await index.upsert(upsertArray);
+
 	}
 }
 
