@@ -16,28 +16,86 @@ function preprocessText(text) {
     return text.replace(/\s+/g, ' ');
 }
 
-// Function to process a PDF file
-async function processPdf(filePath) {
+/**
+	* creates local json file with chunks and chunkIDS 
+	* @param {string} filepath - The path of the file
+	* @param {int} chunkSize - Number of characters in each chunk
+	* @param {string} prefix - The prefix of each chunkID
+	* @param {string} outputPath - where the json file is stored
+*/
+async function processPdf(filePath, chunkSize, prefix, outputPath) {
 	console.log();
 	console.log(`Parsing: ${filePath}`);
     const dataBuffer = fs.readFileSync(filePath);
     const data = await pdfParse(dataBuffer);
     const text = data.text;
+	
 
-    // Split text into chunks
-    const chunkSize = 1000;
-    let chunks = [];
+	// chunks saved as ID with text inside it 
+	let chunkJSON = [];
     for (let i = 0; i < text.length; i += chunkSize) {
+		const id = String(prefix + i);
 		const rawChunk =  text.slice(i, i + chunkSize); 
 		const chunk = preprocessText(rawChunk)
+		chunkJSON.push({
+			"id": id, 
+			"body": chunk
+		});
 		console.log ("Chunk %d : %s", i, chunk); 
-        chunks.push(chunk);
     }
-    return chunks;
+
+	// console.log(chunkJSON);
+
+	// saves chunks as JSON file
+	JSONToFile(chunkJSON, outputPath);
+	console.log("\n\nchunkJSON: \n", chunkJSON);
+
+    return chunkJSON;
 }
 
+
+async function createEmbeddings(outputPath) {
+	// Read the file asynchronously
+	
+
+	var fileContents; 
+	fs.readFile(outputPath, 'utf8', (err, data) => {
+		if (err) {
+			console.error('Error reading the file:', err);
+			return;
+		}
+		// console.log('File contents:', data);
+		fileContents = JSON.parse(data); 
+		// console.log(fileContents);
+		console.log(typeof fileContents);
+	});
+
+	// fileContents.forEach(item => {
+	// 	console.log('Array item:', item);
+	// });
+
+	// Now you can process fileContents here
+	// For example, if fileContents is an array or object:
+	if (Array.isArray(fileContents)) {
+		fileContents.forEach(item => {
+			console.log('Array item:', item);
+		});
+		console.log("Was an array");
+	} else if (typeof fileContents === 'object') {
+		Object.keys(fileContents).forEach(key => {
+			console.log(`${key}: ${fileContents[key]}`);
+		});
+		console.log("Was an object");
+	} else {
+		console.log('Unexpected data format');
+	}
+
+}
+
+
+
 // Function to create embeddings
-async function createEmbeddings(texts) {
+async function createEmbeddingsOG(texts) {
     const embeddingsList = [];
     for (const text of texts) {
         const res = await openai.embeddings.create({
@@ -83,16 +141,25 @@ async function addDocsToPinecone (embeddingsList,indexName, listName) {
 	await index.upsert(docsToUpsert);
 }
 	
+const JSONToFile = (obj, filename) => 
+	fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
 
 
 // manually uploading  
 (async () => {
     const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
-    const processedTexts = await processPdf(filePath);
-    const embeddings = await createEmbeddings(processedTexts);
-	addDocsToPinecone(embeddings,"healthresearch","test1");
-	console.log("These are the embeddings");
-    console.log(embeddings);
+
+	// processes documents and creates file in docDB/indexedChunks.json
+    const processedTexts = await processPdf(filePath,750,"chunksA","indexedChunks");
+
+    // const embeddings = await createEmbeddingsOG(processedTexts);
+
+	// create embeddings based on json file
+	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
+		
+	// addDocsToPinecone(embeddings,"healthresearch","test1");
+	// console.log("These are the embeddings");
+    // console.log(embeddings);
 })();
 
 module.exports = { processPdf, createEmbeddings }  
