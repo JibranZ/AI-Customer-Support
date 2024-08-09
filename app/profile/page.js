@@ -93,9 +93,9 @@ export default function Home() {
       </button>
       <h2>
         {data === "nothing" ? (
-          "Nothing"
+          ""
         ) : (
-          <Link href={`/profile/${data}`}>{data}</Link>
+          <Link href={`/profile/${data}`}>Link to Profile</Link>
         )}
       </h2>
       <button className="signup-button" onClick={getUserDetails}>
