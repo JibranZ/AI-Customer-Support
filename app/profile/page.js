@@ -1,8 +1,12 @@
 "use client";
+import axios from "axios";
+import Link from "next/link";
 import { Box, Button, Stack, TextField } from "@mui/material";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
+import React from "react";
 export default function Home() {
+  const router = useRouter();
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -11,6 +15,7 @@ export default function Home() {
   ]);
 
   const [message, setMessage] = useState("");
+  const [data, setData] = React.useState("nothing");
 
   const sendMessage = async () => {
     setMessages((messages) => [
@@ -58,6 +63,22 @@ export default function Home() {
       console.error("Error fetching data:", error);
     }
   };
+
+  const logout = async () => {
+    try {
+      await axios.get("/api/users/logout");
+      router.push("/login");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const getUserDetails = async () => {
+    const res = await axios.get("/api/users/me");
+    console.log(res.data);
+    setData(res.data.data._id);
+  };
+
   return (
     <Box
       width="100vw"
@@ -67,9 +88,22 @@ export default function Home() {
       justifyContent="center"
       alignItems="center"
     >
+      <button className="signup-button" onClick={logout}>
+        Logout
+      </button>
+      <h2>
+        {data === "nothing" ? (
+          "Nothing"
+        ) : (
+          <Link href={`/profile/${data}`}>{data}</Link>
+        )}
+      </h2>
+      <button className="signup-button" onClick={getUserDetails}>
+        Get User Details
+      </button>
       <Stack
         direction="column"
-        width="600px" // Changed from "600pc" to "600px"
+        width="600px"
         height="700px"
         border="1px solid black"
         p={2}
@@ -83,7 +117,7 @@ export default function Home() {
           maxHeight="100%"
         >
           {messages.map((message, index) => (
-            <Box // Ensure parentheses are used here
+            <Box
               key={index}
               display="flex"
               justifyContent={
