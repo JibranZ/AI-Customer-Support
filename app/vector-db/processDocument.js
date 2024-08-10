@@ -136,19 +136,19 @@ const JSONToFile = (obj, filename) =>
 
 
 
-// manually uploading  
-(async () => {
-    const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
+// // manually uploading  
+// (async () => {
+//     // const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
 
-	// processes documents and creates chunk in docDB/indexedChunks.json
-    const processedTexts = await processPdf(filePath,300,"chunksA","indexedChunks");
+// 	// // processes documents and creates chunk in docDB/indexedChunks.json
+//     // const processedTexts = await processPdf(filePath,300,"chunksA","indexedChunks");
 
-	// create embeddings that are mapped to respective chunk IDs
-	const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
+// 	// // create embeddings that are mapped to respective chunk IDs
+// 	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
 		
-	// embeddings are uploaded to index in database
-	addDocsToPinecone(embeddings,"healthresearch2");
+// 	// // embeddings are uploaded to index in database
+// 	// addDocsToPinecone(embeddings,"healthresearch2");
 
-})();
+// })();
 
-module.exports = { processPdf, createEmbeddings }  
+module.exports = { processPdf, createEmbeddings, addDocsToPinecone }  

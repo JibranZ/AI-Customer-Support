@@ -101,39 +101,39 @@ async function getPrompt (prompt) {
 module.exports = { addDocumentsToIndex, queryIndex, getPrompt, retrieveChunkBody  }; 
 
 
-(async () => {
-	console.log("querier.js");
-	const test2 = 'when was the sale of lab-grown chicken approved?';
-	const test3 = 'has it been approved by the US Department of Agriculture?';
+// (async () => {
+	// console.log("querier.js");
+	// const test2 = 'when was the sale of lab-grown chicken approved?';
+	// const test3 = 'has it been approved by the US Department of Agriculture?';
 
-	embedding2 = await generateEmbedding(test2);
-	embedding3 = await generateEmbedding(test3);
+	// // embedding2 = await generateEmbedding(test2);
+	// // embedding3 = await generateEmbedding(test3);
 	
-	// console.log(embedding1);
+	// // console.log(embedding1);
 
 
-	console.log('\n\n querying embedded data \n\n');
-	// const query1 = await queryIndex(test1,"healthresearch2")
+	// console.log('\n\n querying embedded data \n\n');
+	// // const query1 = await queryIndex(test1,"healthresearch2")
 
-	console.log('\n\n querying embedded data \n\n');
-	const query2 = await queryIndex(test2,"healthresearch2")
+	// console.log('\n\n querying embedded data \n\n');
+	// const query2 = await queryIndex(test2,"healthresearch2")
 
-	console.log('\n\n querying embedded data \n\n');
-	const query3 = await queryIndex(test3,"healthresearch2")
+	// console.log('\n\n querying embedded data \n\n');
+	// const query3 = await queryIndex(test3,"healthresearch2")
 	
-	// for (const part of query1) {
-	// 	// console.log(part);
-	// }
+	// // for (const part of query1) {
+	// // 	// console.log(part);
+	// // }
 	
-	// retrieveChunkBody( "docDB/indexedChunks.json", "chunksA750")
+	// // retrieveChunkBody( "docDB/indexedChunks.json", "chunksA750")
 	
-	getPrompt(test2);
+	// getPrompt(test2);
 
 
-	console.log("\n\ntest3\n");
-	getPrompt(test3);
+	// console.log("\n\ntest3\n");
+	// getPrompt(test3);
 
-})();
+// })();
 
 
 
