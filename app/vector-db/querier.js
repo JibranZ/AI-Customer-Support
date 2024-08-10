@@ -76,21 +76,21 @@ async function getPrompt (prompt) {
 	// get vectors with most matches
 	const matches     = await queryIndex(prompt, "healthresearch2");
 
-	var top3matches = [] 
+	var topmatches = [] 
 
 	// get top 3 matches which also contain the IDs
-	for (let i = 0; i < 3; i++) {
-		top3matches.push (matches[i].id); 
+	for (let i = 0; i < 8; i++) {
+		topmatches.push (matches[i].id); 
 	}
-	console.log(top3matches);
+	console.log(topmatches);
 
 	let context;
 
 	// retrieve bodies of the chunks and add them to the context 
-	for (const match of top3matches) {
+	for (const match of topmatches) {
 		const body = await retrieveChunkBody("docDB/indexedChunks.json", match)
 		console.log(body);
-		context=+ " "; 
+		context=+ " ";
 		context =+ body;
 	} 
 	
@@ -98,16 +98,14 @@ async function getPrompt (prompt) {
 }
 
 
-module.exports = { addDocumentsToIndex, queryIndex }; 
+module.exports = { addDocumentsToIndex, queryIndex, getPrompt, retrieveChunkBody  }; 
 
 
 (async () => {
 	console.log("querier.js");
-	const test1 = 'What are the economic conditions in Iceland?';
 	const test2 = 'when was the sale of lab-grown chicken approved?';
 	const test3 = 'has it been approved by the US Department of Agriculture?';
 
-	embedding1 = await generateEmbedding(test1);
 	embedding2 = await generateEmbedding(test2);
 	embedding3 = await generateEmbedding(test3);
 	
@@ -126,19 +124,10 @@ module.exports = { addDocumentsToIndex, queryIndex };
 	for (const part of query1) {
 		// console.log(part);
 	}
-	// for (const part of query2) {
-	// 	console.log(part);
-	// }
-	// for (const part of query3) {
-	// 	console.log(part);
-	// }
-	//
-	// console.log(query1[0]);
 	
 	// retrieveChunkBody( "docDB/indexedChunks.json", "chunksA750")
 	
-	getPrompt(test1);
-	
+	getPrompt(test2);
 
 })();
 

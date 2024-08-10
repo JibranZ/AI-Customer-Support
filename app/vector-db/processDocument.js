@@ -54,14 +54,14 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 }
 
 
-async function createEmbeddings(outputPath) {
+async function createEmbeddings(jsonFile) {
  
 	//
 	const ps = require('fs').promises; 
 
 	try {
 		// Read the file asynchronously
-		const data = await ps.readFile(outputPath, 'utf8');
+		const data = await ps.readFile(jsonFile, 'utf8');
 
 		// Parse the JSON data
 		const fileContents = JSON.parse(data);
@@ -129,8 +129,11 @@ async function addDocsToPinecone (embeddingsList,indexName) {
 	await index.upsert(docsToUpsert);
 }
 	
+
+// writes json to a file
 const JSONToFile = (obj, filename) => 
 	fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
+
 
 
 // manually uploading  
@@ -138,7 +141,7 @@ const JSONToFile = (obj, filename) =>
     const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
 
 	// processes documents and creates chunk in docDB/indexedChunks.json
-    const processedTexts = await processPdf(filePath,350,"chunksA","indexedChunks");
+    const processedTexts = await processPdf(filePath,100,"chunksA","indexedChunks");
 
 	// create embeddings that are mapped to respective chunk IDs
 	const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
