@@ -79,7 +79,7 @@ async function getPrompt (prompt) {
 	var topmatches = [] 
 
 	// get top 3 matches which also contain the IDs
-	for (let i = 0; i < 8; i++) {
+	for (let i = 0; i < 3; i++) {
 		topmatches.push (matches[i].id); 
 	}
 	console.log(topmatches);
@@ -113,7 +113,7 @@ module.exports = { addDocumentsToIndex, queryIndex, getPrompt, retrieveChunkBody
 
 
 	console.log('\n\n querying embedded data \n\n');
-	const query1 = await queryIndex(test1,"healthresearch2")
+	// const query1 = await queryIndex(test1,"healthresearch2")
 
 	console.log('\n\n querying embedded data \n\n');
 	const query2 = await queryIndex(test2,"healthresearch2")
@@ -121,13 +121,17 @@ module.exports = { addDocumentsToIndex, queryIndex, getPrompt, retrieveChunkBody
 	console.log('\n\n querying embedded data \n\n');
 	const query3 = await queryIndex(test3,"healthresearch2")
 	
-	for (const part of query1) {
-		// console.log(part);
-	}
+	// for (const part of query1) {
+	// 	// console.log(part);
+	// }
 	
 	// retrieveChunkBody( "docDB/indexedChunks.json", "chunksA750")
 	
 	getPrompt(test2);
+
+
+	console.log("\n\ntest3\n");
+	getPrompt(test3);
 
 })();
 

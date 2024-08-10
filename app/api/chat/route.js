@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getPrompt } from "../../vector-db/querier.js";
 
 // Initialize OpenAI client with API key
 const openai = new OpenAI({
@@ -56,11 +57,23 @@ export async function POST(req) {
 
   const data = await req.json();
 
+  // getting user data
+  const relevantInformation = await getPrompt(data); 
+
+
+  // combining prompts 
+  const combinedPrompt = `
+	${userPrompt} 
+	**User Query:** ${data.messages[0]?.content}
+	**Additional Context:** ${relevantInformation}
+  `
+
+
   try {
     // Use the correct method based on the OpenAI library documentation
     const response = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: userPrompt },
+        { role: "system", content: combinedPrompt},
         ...data.messages, // Ensure data.messages is an array
       ],
       model: "gpt-4", // Adjust model name if necessary
