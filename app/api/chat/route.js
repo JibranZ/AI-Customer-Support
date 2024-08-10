@@ -59,11 +59,14 @@ export async function POST(req) {
 
   // // getting user data
   console.log("Data: ", data);
-  console.log("Prompt: ", data['forPrompt']);
-  console.log("Prompt data: ", data['forPrompt'].prompt);
+
+  // getting the string that will be compared with vector database
   const userPrompt = data['forPrompt'].prompt;
 
+  // working directory 
   console.log(process.cwd());
+
+  // retrieving relevant documentation 
   const jsonPath = "app/vector-db/docDB/indexedChunks.json" 
   const relevantInformation = await getPrompt(userPrompt,jsonPath); 
   console.log(relevantInformation);
