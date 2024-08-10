@@ -55,53 +55,56 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 
 
 async function createEmbeddings(outputPath) {
-	// Read the file asynchronously
-	const fs = require('fs');
+ 	
+	const ps = require('fs').promises; 
 
-	// Define fileContents variable in a broader scope if needed
-	let fileContents;
+	try {
+		// Read the file asynchronously
+		const data = await ps.readFile(outputPath, 'utf8');
 
-	const embeddingsList = [];
+		// Parse the JSON data
+		const fileContents = JSON.parse(data);
 
-	fs.readFile(outputPath, 'utf8', (err, data) => {
-		if (err) {
-			console.error('Error reading the file:', err);
-			return;
+		// Define chunkMap and populate it
+		const chunkMap = fileContents.map(item => ({
+			id: item.id,
+			body: item.body
+		}));
+
+		// Print the chunkMap after it has been populated
+		// console.log(chunkMap);
+
+		const embeddingsList = [];
+
+		for (const chunk of chunkMap) { 
+			console.log(chunk);
+
+
+			const res = await openai.embeddings.create({
+				model: MODEL,
+				input: chunk.body,
+				encoding_format: "float",
+			});
+
+			embeddingsList.push({
+				docID: chunk.id,
+				data: res.data[0].embedding
+			});
 		}
 
-		
-		fileContents = JSON.parse(data);
+		console.log(embeddingsList);
+
+		return embeddingsList;
+	} 
+
+	catch (err) {
+		console.error('Error reading or parsing the file:', err);
+		throw err; // Rethrow the error to handle it further up the call stack
+	}
 
 
-		fileContents.forEach(item => {
-			console.log(item.id);
-			console.log(item.body);
-		});
-		// try {
-		// 	// Parse the JSON data
-		// 	fileContents = JSON.parse(data);
 
-		// 	// Log the type of the parsed data
-		// 	console.log('File contents:', fileContents);
-		// 	console.log('Type of fileContents:', typeof fileContents);
 
-		// 	// Check and handle different types of JSON data
-		// 	if (Array.isArray(fileContents)) {
-		// 		console.log('The data is an array.');
-		// 		// Example: Iterate through array items
-		// 		fileContents.forEach(item => console.log(item));
-		// 	} else if (typeof fileContents === 'object' && fileContents !== null) {
-		// 		console.log('The data is an object.');
-		// 		// Example: Iterate through object keys
-		// 		Object.keys(fileContents).forEach(key => console.log(`${key}: ${fileContents[key]}`));
-		// 	} else {
-		// 		console.log('Unexpected data format:', fileContents);
-		// 	}
-
-		// } catch (parseError) {
-		// 	console.error('Error parsing JSON:', parseError);
-		// }
-	})
 }
 
 
