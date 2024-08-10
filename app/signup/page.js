@@ -12,7 +12,7 @@ export default function signupPage() {
     username: "",
   });
 
-  const [buttonDisabled, setButtonDisabled] = React.useState(false);
+  const [buttonDisabled, setButtonDisabled] = React.useState(true);
   const [loading, setLoading] = React.useState(false); // Checks to see if everything has been loaded
 
   const onSignup = async () => {
@@ -44,40 +44,48 @@ export default function signupPage() {
 
   return (
     <div className="main">
-      <h1>{loading ? "Processing" : "Signup"}</h1>
-      <label htmlFor="username">username</label>
-      <input
-        className="textbox"
-        id="username"
-        type="text"
-        value={user.username}
-        onChange={(e) => setUser({ ...user, username: e.target.value })}
-        placeholder="username"
-      />
-      <label htmlFor="username">email</label>
-      <input
-        className="textbox"
-        id="username"
-        type="text"
-        value={user.email}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
-        placeholder="email"
-      />
-      <label htmlFor="username">password</label>
-      <input
-        className="textbox"
-        id="password"
-        type="password"
-        value={user.password}
-        onChange={(e) => setUser({ ...user, password: e.target.value })}
-        placeholder="password"
-      />
-      <button onClick={onSignup} className="signup-button">
-        {buttonDisabled ? "No signup" : "Signup"}
-      </button>
-      <Link href="/login" className="link">
-        Visit Login Page
-      </Link>
+      <h1 className="main-title fade-title">
+        {loading ? "Processing" : "SIGN-UP"}
+      </h1>
+      <div className="container">
+        <label htmlFor="username">Username</label>
+        <input
+          className="textbox"
+          id="username"
+          type="text"
+          value={user.username}
+          onChange={(e) => setUser({ ...user, username: e.target.value })}
+          placeholder="username"
+        />
+        <label htmlFor="username">Email</label>
+        <input
+          className="textbox"
+          id="username"
+          type="text"
+          value={user.email}
+          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          placeholder="email"
+        />
+        <label htmlFor="username">Password</label>
+        <input
+          className="textbox"
+          id="password"
+          type="password"
+          value={user.password}
+          onChange={(e) => setUser({ ...user, password: e.target.value })}
+          placeholder="password"
+        />
+        <button
+          onClick={onSignup}
+          className="signup-button"
+          disabled={buttonDisabled}
+        >
+          {buttonDisabled ? "---" : "Sign up"}
+        </button>
+        <Link href="/login" className="link">
+          Visit Login Page
+        </Link>
+      </div>
     </div>
   );
 }

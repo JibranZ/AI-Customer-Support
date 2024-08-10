@@ -5,22 +5,34 @@
 }
 
 .main h1 {
-  color: whitesmoke;
+  color: #c0c0c0;
   margin-bottom: 30px;
+  font-size: 80px;
 }
+
+h2 {
+  color: #c0c0c0;
+  margin-bottom: 30px;
+  font-size: 40px;
+}
+
 .main label {
-  color: whitesmoke;
+  color: #c0c0c0;
+  font-size: 20px;
+}
+
+.main-title {
+  font-size: 30px;
 }
 
 .link {
-  color: whitesmoke;
-  text-decoration: none;
+  color: lightyellow;
   margin-top: 20px;
 }
 
 /* Styling for the button with class 'signup-button' */
 .signup-button {
-  background-color: whitesmoke; /* Primary color */
+  background-color: #c0c0c0; /* Primary color */
   color: black; /* Text color */
   padding: 10px 20px; /* Padding around the text */
   font-size: 16px; /* Font size */
@@ -32,7 +44,7 @@
 
 /* Hover Effect */
 .signup-button:hover {
-  background-color: #0056b3; /* Darker shade on hover */
+  background-color: white; /* Darker shade on hover */
   transform: translateY(-2px); /* Slight lift effect */
 }
 
@@ -56,22 +68,60 @@
   align-items: center;
   height: 100vh;
   background-color: black;
+  background-color: #355e3b;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  border: 3px solid white;
+  padding: 50px;
+  border-radius: 20px;
 }
 
 .textbox {
-  padding: 10px;
+  padding: 12px;
   margin: 10px 0;
   box-sizing: border-box;
-
   font-size: 16px;
-  border: 2px solid #ccc;
+  border: 3px solid #ccc;
   border-radius: 4px;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   margin-bottom: 20px;
+  background-color: #355e3b;
 }
 
 .textbox:focus {
-  border-color: #007bff;
+  border-color: lightgreen;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  background-color: #fff;
+  border-width: 2px;
+}
+
+.textbox::placeholder {
+  color: #888;
+  font-size: 16px;
+}
+
+.textbox:hover {
+  border-color: lightgreen;
+}
+
+.fade-title {
+  font-size: 48px;
+  color: #333; /* Set your desired color */
+  animation: fadeInOut 3s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  15% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
 }

@@ -32,18 +32,18 @@ export default function verifyEmailPage() {
   }, [token]);
 
   return (
-    <div>
-      <h1>Verify Email</h1>
-      <h2>{token ? `${token}` : "no token"}</h2>
+    <div className="main">
       {verified && (
         <div>
-          <h2>Email Verified</h2>
-          <Link href="/login">Login</Link>
+          <h1 className="main-title fade-title">Email Verified</h1>
+          <Link href="/login" className="link">
+            Login
+          </Link>
         </div>
       )}
       {error && (
         <div>
-          <h2>Error</h2>
+          <h1 className="main-title fade-title">Error</h1>
         </div>
       )}
     </div>

@@ -39,31 +39,38 @@ export default function loginPage() {
 
   return (
     <div className="main">
-      <h1>{loading ? "Proccessing" : "Login"}</h1>
-      <label htmlFor="username">email</label>
-      <input
-        className="textbox"
-        id="username"
-        type="text"
-        value={user.email}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
-        placeholder="email"
-      />
-      <label htmlFor="username">password</label>
-      <input
-        className="textbox"
-        id="password"
-        type="password"
-        value={user.password}
-        onChange={(e) => setUser({ ...user, password: e.target.value })}
-        placeholder="password"
-      />
-      <button onClick={onLogin} className="signup-button">
-        Login Here
-      </button>
-      <Link href="/signup" className="link">
-        Visit Signup Page
-      </Link>
+      <h1 className="main-title fade-title">NutriBot</h1>
+      <div className="container">
+        <h2>{loading ? "Proccessing" : "Login"}</h2>
+        <label htmlFor="username" className="label">
+          Email
+        </label>
+        <input
+          className="textbox"
+          id="username"
+          type="text"
+          value={user.email}
+          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          placeholder="email"
+        />
+        <label htmlFor="username" className="label">
+          Password
+        </label>
+        <input
+          className="textbox"
+          id="password"
+          type="password"
+          value={user.password}
+          onChange={(e) => setUser({ ...user, password: e.target.value })}
+          placeholder="password"
+        />
+        <button onClick={onLogin} className="signup-button">
+          Login
+        </button>
+        <Link href="/signup" className="link">
+          Visit Signup Page
+        </Link>
+      </div>
     </div>
   );
 }

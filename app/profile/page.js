@@ -87,8 +87,21 @@ export default function Home() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      bgcolor={"#355e3b"}
+      position="relative"
     >
-      <button className="signup-button" onClick={logout}>
+      <h1 className="main-title fade-title">NutriBot</h1>
+      <button
+        className="signup-button"
+        onClick={logout}
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          backgroundColor: "lightgreen",
+          color: "black",
+        }}
+      >
         Logout
       </button>
       <h2>
@@ -98,16 +111,14 @@ export default function Home() {
           <Link href={`/profile/${data}`}>Link to Profile</Link>
         )}
       </h2>
-      <button className="signup-button" onClick={getUserDetails}>
-        Get User Details
-      </button>
       <Stack
         direction="column"
         width="600px"
         height="700px"
-        border="1px solid black"
+        border="4px solid black"
         p={2}
         spacing={2}
+        bgcolor={"white"}
       >
         <Stack
           direction="column"
@@ -126,11 +137,9 @@ export default function Home() {
             >
               <Box
                 bgcolor={
-                  message.role === "assistant"
-                    ? "primary.main"
-                    : "secondary.main"
+                  message.role === "assistant" ? "lightgreen" : "#c0c0c0"
                 }
-                color="white"
+                color="black"
                 borderRadius={16}
                 p={3}
               >
@@ -145,8 +154,24 @@ export default function Home() {
             fullWidth
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "green",
+                },
+              },
+            }}
           />
-          <Button variant="contained" onClick={sendMessage}>
+          <Button
+            onClick={sendMessage}
+            sx={{
+              backgroundColor: "#c0c0c0",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "black",
+              },
+            }}
+          >
             Send
           </Button>
         </Stack>
