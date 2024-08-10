@@ -49,6 +49,7 @@ You are NutriBot, an advanced customer support chatbot for NutriLife, a comprehe
 4. **User:** What are the benefits of upgrading to the premium plan?
    **NutriBot:** Upgrading to the premium plan gives you access to advanced features such as personalized meal plans, in-depth nutritional analysis, and priority customer support.
 `;
+
 export async function POST(req) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
