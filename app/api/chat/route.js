@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getPrompt } from "../../vector-db/querier.js";
 
 // Initialize OpenAI client with API key
 const openai = new OpenAI({
@@ -56,14 +57,35 @@ export async function POST(req) {
 
   const data = await req.json();
 
+  // // getting user data
+  console.log("Data: ", data);
+  console.log("Prompt: ", data['forPrompt']);
+  console.log("Prompt data: ", data['forPrompt'].prompt);
+  const userPrompt = data['forPrompt'].prompt;
+
+  console.log(process.cwd());
+  const jsonPath = "app/vector-db/docDB/indexedChunks.json" 
+  const relevantInformation = await getPrompt(userPrompt,jsonPath); 
+  console.log(relevantInformation);
+
+
+  // // combining prompts 
+  const combinedPrompt = `
+	${userPrompt} 
+	**User Query:** ${data.messages[0]?.content}
+	**Additional Context:** ${relevantInformation}
+  `
+  console.log("\n\n\nCombined Prompt: ", combinedPrompt);
+
+
   try {
     // Use the correct method based on the OpenAI library documentation
     const response = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: userPrompt },
+        { role: "system", content: combinedPrompt},
         ...data.messages, // Ensure data.messages is an array
       ],
-      model: "gpt-4", // Adjust model name if necessary
+      model: "gpt-4o-mini", // Adjust model name if necessary
       stream: true,
     });
 

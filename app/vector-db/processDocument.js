@@ -41,84 +41,74 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 			"id": id, 
 			"body": chunk
 		});
-		console.log ("Chunk %d : %s", i, chunk); 
+		// console.log ("Chunk %d : %s", i, chunk); 
     }
 
 	// console.log(chunkJSON);
 
 	// saves chunks as JSON file
 	JSONToFile(chunkJSON, outputPath);
-	console.log("\n\nchunkJSON: \n", chunkJSON);
+	// console.log("\n\nchunkJSON: \n", chunkJSON);
 
     return chunkJSON;
 }
 
 
-async function createEmbeddings(outputPath) {
-	// Read the file asynchronously
-	
+async function createEmbeddings(jsonFile) {
+ 
+	//
+	const ps = require('fs').promises; 
 
-	var fileContents; 
-	fs.readFile(outputPath, 'utf8', (err, data) => {
-		if (err) {
-			console.error('Error reading the file:', err);
-			return;
+	try {
+		// Read the file asynchronously
+		const data = await ps.readFile(jsonFile, 'utf8');
+
+		// Parse the JSON data
+		const fileContents = JSON.parse(data);
+
+		// Define chunkMap and populate it
+		const chunkMap = fileContents.map(item => ({
+			id: item.id,
+			body: item.body
+		}));
+
+		// will contain: docID, docVector
+		const embeddingsList = [];
+
+
+		// populate embeddingsList with docID-docVector pairs
+		for (const chunk of chunkMap) { 
+			console.log(chunk);
+
+
+			const res = await openai.embeddings.create({
+				model: MODEL,
+				input: chunk.body,
+				encoding_format: "float",
+			});
+
+			embeddingsList.push({
+				docID: chunk.id,
+				data: res.data[0].embedding
+			});
 		}
-		// console.log('File contents:', data);
-		fileContents = JSON.parse(data); 
-		// console.log(fileContents);
-		console.log(typeof fileContents);
-	});
 
-	// fileContents.forEach(item => {
-	// 	console.log('Array item:', item);
-	// });
+		console.log(embeddingsList);
 
-	// Now you can process fileContents here
-	// For example, if fileContents is an array or object:
-	if (Array.isArray(fileContents)) {
-		fileContents.forEach(item => {
-			console.log('Array item:', item);
-		});
-		console.log("Was an array");
-	} else if (typeof fileContents === 'object') {
-		Object.keys(fileContents).forEach(key => {
-			console.log(`${key}: ${fileContents[key]}`);
-		});
-		console.log("Was an object");
-	} else {
-		console.log('Unexpected data format');
+		return embeddingsList;
+	} 
+
+	catch (err) {
+		console.error('Error reading or parsing the file:', err);
+		throw err; // Rethrow the error to handle it further up the call stack
 	}
 
 }
 
 
 
-// Function to create embeddings
-async function createEmbeddingsOG(texts) {
-    const embeddingsList = [];
-    for (const text of texts) {
-        const res = await openai.embeddings.create({
-			model: MODEL,
-            input: text,
-			encoding_format: "float",
-        });
-		console.log();
-		// console.log("\nEmbedding");
-		// console.log(res);
-		// embeddingsList.push(res);
-		// console.log("\nEmbeddingList");
-		// console.log(res.data[0].embedding);
-        embeddingsList.push(res.data[0].embedding);
-    }
 
-	console.log("\nEmbeddingList");
-	console.log(embeddingsList);
-    return embeddingsList;
-}
-
-
-async function addDocsToPinecone (embeddingsList,indexName, listName) {
+async function addDocsToPinecone (embeddingsList,indexName) {
 	const index = await createIndex(indexName); 
 
 	// an array that will be populated with the chunk embeddings 
@@ -127,39 +117,38 @@ async function addDocsToPinecone (embeddingsList,indexName, listName) {
 	console.log('\n\naddDocToPineCone -- for-loop on embeddingsList\n')
 	console.log(embeddingsList[0]);
 	
-	// iterate through the embeddings, creating a unique ID based on the listName
+	// iterate through the embeddings, mapping the chunkIDs to corresponding vectors
 	for (let i = 0; i < embeddingsList.length; i++) {
 		docsToUpsert.push({
-			id: String(listName + i),
-			values: embeddingsList[i],
+			id: embeddingsList[i].docID,
+			values: embeddingsList[i].data,
 		});
-		// console.log(i);
-		// console.log(embeddingsList[i]); 
 	}
 	console.log("\n\nDocsToUpsert:\n\n");
 	console.log(docsToUpsert);
 	await index.upsert(docsToUpsert);
 }
 	
+
+// writes json to a file
 const JSONToFile = (obj, filename) => 
 	fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
 
 
-// manually uploading  
-(async () => {
-    const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
 
-	// processes documents and creates file in docDB/indexedChunks.json
-    const processedTexts = await processPdf(filePath,750,"chunksA","indexedChunks");
+// // manually uploading  
+// (async () => {
+//     // const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
 
-    // const embeddings = await createEmbeddingsOG(processedTexts);
+// 	// // processes documents and creates chunk in docDB/indexedChunks.json
+//     // const processedTexts = await processPdf(filePath,300,"chunksA","indexedChunks");
 
-	// create embeddings based on json file
-	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
+// 	// // create embeddings that are mapped to respective chunk IDs
+// 	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
 		
-	// addDocsToPinecone(embeddings,"healthresearch","test1");
-	// console.log("These are the embeddings");
-    // console.log(embeddings);
-})();
+// 	// // embeddings are uploaded to index in database
+// 	// addDocsToPinecone(embeddings,"healthresearch2");
 
-module.exports = { processPdf, createEmbeddings }  
+// })();
+
+module.exports = { processPdf, createEmbeddings, addDocsToPinecone }  

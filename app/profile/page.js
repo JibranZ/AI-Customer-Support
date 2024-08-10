@@ -33,6 +33,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           messages: [...messages, { role: "user", content: message }],
+		  forPrompt: { prompt: message},	
         }),
       });
 
