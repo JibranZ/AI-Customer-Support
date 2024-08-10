@@ -72,7 +72,7 @@ async function retrieveChunkBody (outputPath, chunkID) {
 }
 
 
-async function getPrompt (prompt) {
+async function getPrompt (prompt,path) {
 	// get vectors with most matches
 	const matches     = await queryIndex(prompt, "healthresearch2");
 
@@ -86,14 +86,17 @@ async function getPrompt (prompt) {
 
 	let context;
 
-	// retrieve bodies of the chunks and add them to the context 
-	for (const match of topmatches) {
-		const body = await retrieveChunkBody("docDB/indexedChunks.json", match)
+	//retrieve bodies of the chunks and add them to the context 
+	for (const match of topmatches) { 
+
+        // this is the path: docDB/indexedChunks.json
+		const body = await retrieveChunkBody(path, match)
 		console.log(body);
-		context=+ " ";
-		context =+ body;
+		context += " ";
+		context += body;
 	} 
-	
+	console.log("Context: ", context);
+	console.log(process.cwd());
 
 }
 

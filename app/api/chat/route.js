@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-// import { getPrompt } from "../../vector-db/querier.js";
+import { getPrompt } from "../../vector-db/querier.js";
 
 // Initialize OpenAI client with API key
 const openai = new OpenAI({
@@ -58,7 +58,16 @@ export async function POST(req) {
   const data = await req.json();
 
   // // getting user data
-  // const relevantInformation = await getPrompt(data); 
+  console.log("Data: ", data);
+  console.log("Prompt: ", data['forPrompt']);
+  console.log("Prompt data: ", data['forPrompt'].prompt);
+  const userPrompt = data['forPrompt'].prompt;
+
+  console.log(process.cwd());
+  const jsonPath = "app/vector-db/docDB/indexedChunks.json" 
+  // const jsonPath = '../../vector-db/docDB/indexedChunks.js' 
+  const relevantInformation = await getPrompt(userPrompt,jsonPath); 
+  console.log(relevantInformation);
 
 
   // // combining prompts 
