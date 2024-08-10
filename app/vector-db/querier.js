@@ -95,8 +95,9 @@ async function getPrompt (prompt,path) {
 		context += " ";
 		context += body;
 	} 
-	console.log("Context: ", context);
-	console.log(process.cwd());
+	// console.log("Context: ", context);
+	// console.log(process.cwd());
+	return context;
 
 }
 

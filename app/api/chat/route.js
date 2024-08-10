@@ -65,24 +65,24 @@ export async function POST(req) {
 
   console.log(process.cwd());
   const jsonPath = "app/vector-db/docDB/indexedChunks.json" 
-  // const jsonPath = '../../vector-db/docDB/indexedChunks.js' 
   const relevantInformation = await getPrompt(userPrompt,jsonPath); 
   console.log(relevantInformation);
 
 
   // // combining prompts 
-  // const combinedPrompt = `
-	// ${userPrompt} 
-	// **User Query:** ${data.messages[0]?.content}
-	// **Additional Context:** ${relevantInformation}
-  // `
+  const combinedPrompt = `
+	${userPrompt} 
+	**User Query:** ${data.messages[0]?.content}
+	**Additional Context:** ${relevantInformation}
+  `
+  console.log("\n\n\nCombined Prompt: ", combinedPrompt);
 
 
   try {
     // Use the correct method based on the OpenAI library documentation
     const response = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: userPrompt},
+        { role: "system", content: combinedPrompt},
         ...data.messages, // Ensure data.messages is an array
       ],
       model: "gpt-4o-mini", // Adjust model name if necessary
