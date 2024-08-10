@@ -11,27 +11,30 @@ const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 });
 
-// preprocess text
+
+// clean the text
 function preprocessText(text) {
     return text.replace(/\s+/g, ' ');
 }
 
 /**
 	* creates local json file with chunks and chunkIDS 
-	* @param {string} filepath - The path of the file
+	* @param {string} filepath - The path of the document file what will be chunkified
 	* @param {int} chunkSize - Number of characters in each chunk
-	* @param {string} prefix - The prefix of each chunkID
-	* @param {string} outputPath - where the json file is stored
+	* @param {string} prefix - The prefix of each chunkID -- useful for organization
+	* @param {string} outputPath - json file with JSON list -- {chunkID, chunkBody} 
 */
 async function processPdf(filePath, chunkSize, prefix, outputPath) {
 	console.log();
 	console.log(`Parsing: ${filePath}`);
+
+	// reading the documentation and parsing it into a variable
     const dataBuffer = fs.readFileSync(filePath);
     const data = await pdfParse(dataBuffer);
     const text = data.text;
 	
 
-	// chunks saved as ID with text inside it 
+	// creating document chunks with corresponding IDs based off the prefix
 	let chunkJSON = [];
     for (let i = 0; i < text.length; i += chunkSize) {
 		const id = String(prefix + i);
@@ -41,24 +44,20 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 			"id": id, 
 			"body": chunk
 		});
-		// console.log ("Chunk %d : %s", i, chunk); 
     }
 
-	// console.log(chunkJSON);
-
-	// saves chunks as JSON file
+	// writing the document chunks to a JSON file  
 	JSONToFile(chunkJSON, outputPath);
-	// console.log("\n\nchunkJSON: \n", chunkJSON);
 
     return chunkJSON;
 }
 
 
+// creating embeddings based on a json fiel 
 async function createEmbeddings(jsonFile) {
  
-	//
+	// asynchronous file reading 
 	const ps = require('fs').promises; 
-
 	try {
 		// Read the file asynchronously
 		const data = await ps.readFile(jsonFile, 'utf8');
@@ -66,34 +65,32 @@ async function createEmbeddings(jsonFile) {
 		// Parse the JSON data
 		const fileContents = JSON.parse(data);
 
-		// Define chunkMap and populate it
+		// loading JSON file into iterable object 
 		const chunkMap = fileContents.map(item => ({
 			id: item.id,
 			body: item.body
 		}));
 
-		// will contain: docID, docVector
+		// will contain: docID, docVector. docID corresponds to chunkID in processPDF 
 		const embeddingsList = [];
-
 
 		// populate embeddingsList with docID-docVector pairs
 		for (const chunk of chunkMap) { 
 			console.log(chunk);
 
-
+			// create embeddings using OpenAI 
 			const res = await openai.embeddings.create({
 				model: MODEL,
 				input: chunk.body,
 				encoding_format: "float",
 			});
-
+			
+			// store embeddings in a list
 			embeddingsList.push({
 				docID: chunk.id,
 				data: res.data[0].embedding
 			});
 		}
-
-		console.log(embeddingsList);
 
 		return embeddingsList;
 	} 
@@ -106,12 +103,12 @@ async function createEmbeddings(jsonFile) {
 }
 
 
-
-
+// writes all the embeddings to the index
 async function addDocsToPinecone (embeddingsList,indexName) {
+	// creates index if it is not there 
 	const index = await createIndex(indexName); 
 
-	// an array that will be populated with the chunk embeddings 
+	// for storing the chunk embeddings 
 	const docsToUpsert = [];
 
 	console.log('\n\naddDocToPineCone -- for-loop on embeddingsList\n')
@@ -135,20 +132,23 @@ const JSONToFile = (obj, filename) =>
 	fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
 
 
+/*
 
-// // manually uploading  
-// (async () => {
-//     // const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
+	// pipeline for processing documents
+(async () => {
+	// put document file path here. Relative to current directory 
+    const filePath = './foodtrends_capitalgroup.pdf'; // Replace with your actual file path
 
-// 	// // processes documents and creates chunk in docDB/indexedChunks.json
-//     // const processedTexts = await processPdf(filePath,300,"chunksA","indexedChunks");
+	// processes documents and creates chunks in docDB/indexedChunks.json
+    const processedTexts = await processPdf(filePath,300,"chunksA","indexedChunks");
 
-// 	// // create embeddings that are mapped to respective chunk IDs
-// 	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
+	// create embeddings that are mapped to chunkIDs that were saved in indexedChunks.json 
+	const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
 		
-// 	// // embeddings are uploaded to index in database
-// 	// addDocsToPinecone(embeddings,"healthresearch2");
+	// embeddings are uploaded to index 'healthresearch2' in database
+	addDocsToPinecone(embeddings,"healthresearch2");
 
-// })();
+}();
+*/
 
 module.exports = { processPdf, createEmbeddings, addDocsToPinecone }  

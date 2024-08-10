@@ -10,7 +10,7 @@ const openai = new OpenAI({
 
 
 
-// returns embedding given text 
+// testing: returns embedding given text  
 async function generateEmbedding (text) {
 	const response = await openai.embeddings.create({
 		input: text, 
@@ -22,7 +22,7 @@ async function generateEmbedding (text) {
 
 
 
-// adds documents 
+// testing: adds documents 
 async function addDocumentsToIndex (documents, indexName) {
 	const index = await createIndex(indexName); 
 	
@@ -56,6 +56,13 @@ async function queryIndex(query, indexName) {
 }
 
 
+
+/**
+	* after getting results from pinecone query, the body of the resulting vector is 
+	* located and returned
+	* @param {outputPath} - the path to the json file containing the chunks -- (chunkID, body) 
+	* @param {chunkID} - the chunkID to locate within the file 
+*/
 async function retrieveChunkBody (outputPath, chunkID) {
 	
 	const ps = require('fs').promises; 
@@ -67,11 +74,20 @@ async function retrieveChunkBody (outputPath, chunkID) {
 	const fileContents = JSON.parse(data);
 
 	const result = fileContents.find(item => item.id === chunkID);
-	// console.log(result);
 	return result.body;
+
 }
 
 
+
+
+// getting relevant information given a prompt 
+//
+
+/** Retrieving relevant documentation given a prompt 
+	*
+	*
+*/ 
 async function getPrompt (prompt,path) {
 	// get vectors with most matches
 	const matches     = await queryIndex(prompt, "healthresearch2");
