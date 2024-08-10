@@ -41,14 +41,14 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 			"id": id, 
 			"body": chunk
 		});
-		console.log ("Chunk %d : %s", i, chunk); 
+		// console.log ("Chunk %d : %s", i, chunk); 
     }
 
 	// console.log(chunkJSON);
 
 	// saves chunks as JSON file
 	JSONToFile(chunkJSON, outputPath);
-	console.log("\n\nchunkJSON: \n", chunkJSON);
+	// console.log("\n\nchunkJSON: \n", chunkJSON);
 
     return chunkJSON;
 }
@@ -56,40 +56,52 @@ async function processPdf(filePath, chunkSize, prefix, outputPath) {
 
 async function createEmbeddings(outputPath) {
 	// Read the file asynchronously
-	
+	const fs = require('fs');
 
-	var fileContents; 
+	// Define fileContents variable in a broader scope if needed
+	let fileContents;
+
+	const embeddingsList = [];
+
 	fs.readFile(outputPath, 'utf8', (err, data) => {
 		if (err) {
 			console.error('Error reading the file:', err);
 			return;
 		}
-		// console.log('File contents:', data);
-		fileContents = JSON.parse(data); 
-		// console.log(fileContents);
-		console.log(typeof fileContents);
-	});
 
-	// fileContents.forEach(item => {
-	// 	console.log('Array item:', item);
-	// });
+		
+		fileContents = JSON.parse(data);
 
-	// Now you can process fileContents here
-	// For example, if fileContents is an array or object:
-	if (Array.isArray(fileContents)) {
+
 		fileContents.forEach(item => {
-			console.log('Array item:', item);
+			console.log(item.id);
+			console.log(item.body);
 		});
-		console.log("Was an array");
-	} else if (typeof fileContents === 'object') {
-		Object.keys(fileContents).forEach(key => {
-			console.log(`${key}: ${fileContents[key]}`);
-		});
-		console.log("Was an object");
-	} else {
-		console.log('Unexpected data format');
-	}
+		// try {
+		// 	// Parse the JSON data
+		// 	fileContents = JSON.parse(data);
 
+		// 	// Log the type of the parsed data
+		// 	console.log('File contents:', fileContents);
+		// 	console.log('Type of fileContents:', typeof fileContents);
+
+		// 	// Check and handle different types of JSON data
+		// 	if (Array.isArray(fileContents)) {
+		// 		console.log('The data is an array.');
+		// 		// Example: Iterate through array items
+		// 		fileContents.forEach(item => console.log(item));
+		// 	} else if (typeof fileContents === 'object' && fileContents !== null) {
+		// 		console.log('The data is an object.');
+		// 		// Example: Iterate through object keys
+		// 		Object.keys(fileContents).forEach(key => console.log(`${key}: ${fileContents[key]}`));
+		// 	} else {
+		// 		console.log('Unexpected data format:', fileContents);
+		// 	}
+
+		// } catch (parseError) {
+		// 	console.error('Error parsing JSON:', parseError);
+		// }
+	})
 }
 
 
@@ -143,6 +155,7 @@ async function addDocsToPinecone (embeddingsList,indexName, listName) {
 	
 const JSONToFile = (obj, filename) => 
 	fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
+	// fs.writeFileSync(`docDB/${filename}.json`, JSON.stringify(obj,null,2));
 
 
 // manually uploading  
@@ -155,7 +168,7 @@ const JSONToFile = (obj, filename) =>
     // const embeddings = await createEmbeddingsOG(processedTexts);
 
 	// create embeddings based on json file
-	// const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
+	const embeddings = await createEmbeddings("docDB/indexedChunks.json");	
 		
 	// addDocsToPinecone(embeddings,"healthresearch","test1");
 	// console.log("These are the embeddings");
